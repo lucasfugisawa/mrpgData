@@ -5,8 +5,8 @@
 	, activeMemberships.campaignsActiveLast28days, activeMemberships.campaignsActiveLast56days, activeMemberships.campaignsActiveLast84days
 	, COALESCE(ownedCampaigns.campaignsOwned, 0) campaignsOwned
 	, COALESCE(lfpCampaigns.lfpCount, 0) AS lfpCount
-	, COALESCE(asksToJoin.askToJoinCount) askToJoinCount
-	, COALESCE(cogmCamps.cogmCampsCount) AS cogmCampsCount
+	, COALESCE(asksToJoin.askToJoinCount, 0) askToJoinCount
+	, COALESCE(cogmCamps.cogmCampsCount, 0) AS cogmCampsCount
 FROM users users
 LEFT JOIN (
 	-- users' number of memberships on active campaigns
@@ -47,8 +47,7 @@ LEFT JOIN (
 	FROM users users
 	INNER JOIN campaigns camps ON camps.owner = users.uid
 	INNER JOIN lfp lfp ON lfp.campaign = camps.uid
-	WHERE lfp.enabled = 1
-		AND camps.contact = 0
+	WHERE camps.contact = 0
 	GROUP BY users.uid
 ) lfpCampaigns ON lfpCampaigns.user = users.uid
 LEFT JOIN (
@@ -57,8 +56,7 @@ LEFT JOIN (
 		, COUNT(*) AS askToJoinCount
 	FROM lfp lfp
 	INNER JOIN lfp_asking_to_join atj ON atj.campaign = lfp.campaign
-	WHERE lfp.enabled = 1
-		AND atj.accepted = 0
+	WHERE atj.accepted = 0
 		AND atj.rejected = 0
 	GROUP BY atj.user
 ) asksToJoin ON asksToJoin.user = users.uid
@@ -74,13 +72,13 @@ ORDER BY activeMemberships.campaignsTotal DESC
 
 
 
-</sql><sql name="SQL 3">SELECT camps.uid, camps.name
-	, camps.membersCount
-	, camps.coGMsCount
-	, camps.charactersCount
-	, camps.membersCount - camps.coGMsCount - 1 as playersCount
-	, camps.messagesDiceCount
-	, (strftime('%s', '2020-11-09 20:00:00') - camps.lastActiveAt / 1000) / (60*60*24) as idleFOrDays
-FROM campaigns camps
-WHERE camps.contact = 0
-	AND NOT (camps.membersCount &lt;= 1 AND camps.previousMembersCount = 0 AND camps.messagesCount &lt;= 1)</sql><current_tab id="1"/></tab_sql></sqlb_project>
+</sql><sql name="SQL 3">SELECT camps.uid
+	, camps.membersCount
+	, camps.coGMsCount
+	, camps.charactersCount
+	, camps.membersCount - camps.coGMsCount - 1 as playersCount
+	, camps.messagesDiceCount
+	, (strftime('%s', '2020-11-09 20:00:00') - camps.lastActiveAt / 1000) / (60*60*24) as idleFOrDays
+FROM campaigns camps
+WHERE camps.contact = 0
+	AND NOT (camps.membersCount &lt;= 1 AND camps.previousMembersCount = 0 AND camps.messagesCount &lt;= 1)</sql><current_tab id="0"/></tab_sql></sqlb_project>
